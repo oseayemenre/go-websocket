@@ -33,8 +33,6 @@ func (h *Hub) websocketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defer conn.Close()
-
 	client := NewClient(conn, h)
 	h.AddClient(client)
 
@@ -50,9 +48,9 @@ func (h *Hub) AddClient(client *Client) {
 
 func (h *Hub) RemoveClient(client *Client) {
 	h.Mutex.Lock()
+	defer h.Mutex.Unlock()
 	client.conn.Close()
 	if _, ok := h.clients[client]; ok {
 		delete(h.clients, client)
 	}
-	defer h.Mutex.Unlock()
 }

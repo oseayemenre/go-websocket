@@ -16,7 +16,10 @@ func NewClient(conn *websocket.Conn, hub *Hub) *Client {
 }
 
 func (c *Client) readMessage() {
-	defer c.hub.RemoveClient(c)
+	defer func() {
+		c.hub.RemoveClient(c)
+		log.Println("Read message loop terminated")
+	}()
 
 	for {
 		_, message, err := c.conn.ReadMessage()
@@ -28,16 +31,19 @@ func (c *Client) readMessage() {
 			break
 		}
 
+		log.Println(string(message))
+
 		for client := range c.hub.clients {
 			client.egress <- message
 		}
-
-		log.Println(message)
 	}
 }
 
 func (c *Client) writeMessage() {
-	defer c.hub.RemoveClient(c)
+	defer func() {
+		c.hub.RemoveClient(c)
+		log.Println("Write message loop terminated")
+	}()
 
 	for {
 		select {

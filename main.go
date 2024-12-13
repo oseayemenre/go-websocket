@@ -22,7 +22,9 @@ func main() {
 
 	r.HandleFunc("/ws", hub.websocketHandler)
 
-	if err := http.ListenAndServe(":3000", r); err != nil {
+	log.Println("Server is listening on port 8080...")
+
+	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatal(err)
 	}
 }
