@@ -59,7 +59,6 @@ func (h *Hub) removeClient(c *Client) {
 
 func (c *Client) readMessage() {
 	defer func() {
-		log.Println("Hit read clean up")
 		c.hub.removeClient(c)
 	}()
 
@@ -68,6 +67,7 @@ func (c *Client) readMessage() {
 		log.Println("pong")
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	})
+	c.conn.SetReadLimit(512)
 
 	for {
 		_, message, err := c.conn.ReadMessage()
@@ -88,9 +88,7 @@ func (c *Client) readMessage() {
 }
 
 func (c *Client) writeMessage() {
-
 	defer func() {
-		log.Println("Hit write clean up")
 		c.hub.removeClient(c)
 	}()
 
